@@ -1,11 +1,7 @@
 
 Koncept notes Web App.odt
-
-
 .env
-
-
 node_modules/
-
-
 src/backend/notes-web-app-baa92-firebase-adminsdk-7avxv-748e8376a7.json
+.vscode/
+src/logs/
