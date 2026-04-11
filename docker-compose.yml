@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  notesApp:
+    container_name: notesApp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - main_network
+    ports:
+      - "127.0.0.1:8085:8088"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "15m"
+        max-file: "5"
+    volumes:
+      - /root/main/notesApp/logs:/app/src/logs
+      - /root/main/notesApp/.env:/app/.env
+
+networks:
+  main_network:
+    external: true

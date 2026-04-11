@@ -2,11 +2,11 @@ FROM node:20.18.0
 
 WORKDIR /app
 
-COPY package*.json  .
+COPY package*.json ./
 
-COPY . .
+RUN npm install
 
-RUN rm -rf node_modules && npm install 
+COPY . . 
 
 EXPOSE 8088
 
