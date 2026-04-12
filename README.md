@@ -1,7 +1,7 @@
 # **Notes Web Application.**
 ## Simple notes manager
 
-Link to page of the project: https://noteswebapp.pl
+Link to page of the project: https://notesapp.msliwowski.net
 
 ## Idea of the project 
 This was my second full stack project in node.js. I don't want to copy existing in the Internet projects and decided to make my own version. It's not perfect in the graphic layer but work (in my opinion) perfectly.
