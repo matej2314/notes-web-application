@@ -1,4 +1,4 @@
-import connection from '../db.js';
+import pool from '../db.js';
 import { logger } from '../logger.js';
 
 const sendAvatar = async (req, res) => {
@@ -7,7 +7,7 @@ const sendAvatar = async (req, res) => {
 	const sqlQuery = 'SELECT avatar FROM users WHERE id=?';
 
 	try {
-		const [result] = await connection.query(sqlQuery, [userId]);
+		const [result] = await pool.query(sqlQuery, [userId]);
 
 		if (result.length === 0) {
 			return res.status(404).json({ message: 'Nie znaleziono użytkownika.' });

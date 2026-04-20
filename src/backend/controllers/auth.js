@@ -4,8 +4,7 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
-import connection from '../db.js';
-import { logger } from '../logger.js';
+import pool, { withTransaction } from '../db.js';
 import { isValidPassword, isValidEmail, isValidUsername } from '../lib/validation/validationUtils.js';
 import notesErrorHandler from '../lib/notesErrorHandler.js';
 import jwtCookieOptions from '../lib/jwtCookieOptions.js';
@@ -53,20 +52,32 @@ const registerUser = async (req, res) => {
 			return;
 		}
 
-		const [existing] = await connection.query(authQueries.checkEmailExists, [reg_email]);
-		if (existing.length > 0) {
-			return res.status(400).send('Ten adres e-mail jest już zarejestrowany!');
+		let userId;
+		try {
+			userId = await withTransaction(async (conn) => {
+				const [existing] = await conn.query(authQueries.checkEmailExists, [reg_email]);
+				if (existing.length > 0) {
+					const err = new Error('Ten adres e-mail jest już zarejestrowany!');
+					err.statusCode = 400;
+					throw err;
+				}
+				const id = uuidv4();
+				const hashedPasswd = await bcrypt.hash(reg_password, 10);
+				await conn.query(authQueries.registerUser, {
+					id,
+					name: reg_username,
+					email: reg_email,
+					password: hashedPasswd,
+				});
+				return id;
+			});
+		} catch (err) {
+			if (err.statusCode === 400) {
+				return res.status(400).send(err.message);
+			}
+			notesErrorHandler(err, 500, err.message, 'Błąd serwera', res);
+			return;
 		}
-
-		const hashedPasswd = await bcrypt.hash(reg_password, 10);
-		const userId = uuidv4();
-
-		await connection.query(authQueries.registerUser, {
-			id: userId,
-			name: reg_username,
-			email: reg_email,
-			password: hashedPasswd,
-		});
 
 		const token = jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '1h' });
 		res.cookie('SESSID', token, jwtCookieOptions);
@@ -86,7 +97,7 @@ const loginUser = async (req, res) => {
 	}
 
 	try {
-		const [results] = await connection.query(authQueries.loginUser, [email]);
+		const [results] = await pool.query(authQueries.loginUser, [email]);
 
 		if (results.length === 0) {
 			return res.status(400).json({ message: 'Niepoprawne dane logowania.' });
@@ -124,22 +135,33 @@ const changeEmail = async (req, res) => {
 	}
 
 	try {
-		const [emailTaken] = await connection.query(authQueries.checkUserExists, [newEmail, userId]);
-		if (emailTaken.length > 0) {
-			return res.status(400).json({ message: 'Ten adres e-mail jest już zarejestrowany!' });
-		}
+		await withTransaction(async (conn) => {
+			const [emailTaken] = await conn.query(authQueries.checkUserExists, [newEmail, userId]);
+			if (emailTaken.length > 0) {
+				const err = new Error('Ten adres e-mail jest już zarejestrowany!');
+				err.statusCode = 400;
+				throw err;
+			}
 
-		const [userRows] = await connection.query(authQueries.checkUserData, [userId, username, email]);
-		if (userRows.length === 0) {
-			return res.status(400).json({ message: 'Podano nieprawidłowe dane użytkownika' });
-		}
+			const [userRows] = await conn.query(authQueries.checkUserData, [userId, username, email]);
+			if (userRows.length === 0) {
+				const err = new Error('Podano nieprawidłowe dane użytkownika');
+				err.statusCode = 400;
+				throw err;
+			}
 
-		const [updateResult] = await connection.query(authQueries.updateEmail, [newEmail, userId]);
-		if (updateResult.affectedRows === 0) {
-			return res.status(400).json({ message: 'Nie udało się zmienić adresu e-mail' });
-		}
+			const [updateResult] = await conn.query(authQueries.updateEmail, [newEmail, userId]);
+			if (updateResult.affectedRows === 0) {
+				const err = new Error('Nie udało się zmienić adresu e-mail');
+				err.statusCode = 400;
+				throw err;
+			}
+		});
 		return res.status(200).json({ message: 'Adres e-mail zmieniony pomyślnie' });
 	} catch (error) {
+		if (error.statusCode === 400) {
+			return res.status(400).json({ message: error.message });
+		}
 		notesErrorHandler(error, 500, error.message, 'Błąd serwera', res);
 		return;
 	}
@@ -154,28 +176,39 @@ const changePass = async (req, res) => {
 	}
 
 	try {
-		const [rows] = await connection.query(authQueries.checkPassword, [userId, userName]);
+		await withTransaction(async (conn) => {
+			const [rows] = await conn.query(authQueries.checkPassword, [userId, userName]);
 
-		if (rows.length === 0) {
-			return res.status(400).json({ message: 'Nieprawidłowe dane użytkownika.' });
-		}
+			if (rows.length === 0) {
+				const err = new Error('Nieprawidłowe dane użytkownika.');
+				err.statusCode = 400;
+				throw err;
+			}
 
-		const row = rows[0];
-		const isMatch = await bcrypt.compare(oldPass, row.password);
+			const row = rows[0];
+			const isMatch = await bcrypt.compare(oldPass, row.password);
 
-		if (!isMatch) {
-			return res.status(400).json({ message: 'Podaj poprawne obecne hasło.' });
-		}
+			if (!isMatch) {
+				const err = new Error('Podaj poprawne obecne hasło.');
+				err.statusCode = 400;
+				throw err;
+			}
 
-		const hashedPasswd = await bcrypt.hash(newPass, 10);
+			const hashedPasswd = await bcrypt.hash(newPass, 10);
 
-		const [updateResult] = await connection.query(authQueries.updatePassword, [hashedPasswd, userId]);
-		if (updateResult.affectedRows === 0) {
-			return res.status(400).json({ message: 'Nie udało się zmienić hasła' });
-		}
+			const [updateResult] = await conn.query(authQueries.updatePassword, [hashedPasswd, userId]);
+			if (updateResult.affectedRows === 0) {
+				const err = new Error('Nie udało się zmienić hasła');
+				err.statusCode = 400;
+				throw err;
+			}
+		});
 
 		return res.status(200).json({ message: 'Hasło zostało zmienione.' });
 	} catch (error) {
+		if (error.statusCode === 400) {
+			return res.status(400).json({ message: error.message });
+		}
 		notesErrorHandler(error, 500, error.message, 'Błąd serwera', res);
 		return;
 	}

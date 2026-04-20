@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import connection from '../db.js';
+import pool from '../db.js';
 import bodyParser from 'body-parser';
 import generatePDF from '../controllers/generatePDF.js';
 import { verifyToken } from '../controllers/verifyJWT.js';
@@ -30,7 +30,7 @@ router.post('/', verifyJWT, async (req, res) => {
 	const sqlQuery = notesQueries.saveNote;
 
 	try {
-		await connection.query(sqlQuery, [id, userId, noteTitle, noteContent, noteWeight, date]);
+		await pool.query(sqlQuery, [id, userId, noteTitle, noteContent, noteWeight, date]);
 		res.status(201).json({
 			message: 'Notatka dodana pomyślnie!',
 			noteId: id,
@@ -50,7 +50,7 @@ router.get('/all', verifyJWT, async (req, res) => {
 	const sqlQuery = notesQueries.getAllNotes;
 
 	try {
-		const [rows] = await connection.query(sqlQuery, [userId]);
+		const [rows] = await pool.query(sqlQuery, [userId]);
 		if (rows.length === 0) {
 			return res.status(200).json({ notes: [] });
 		}
@@ -74,7 +74,7 @@ router.get('/:noteId', verifyJWT, async (req, res) => {
 	const sqlQuery = notesQueries.getNote;
 
 	try {
-		const [result] = await connection.query(sqlQuery, [noteId, userId]);
+		const [result] = await pool.query(sqlQuery, [noteId, userId]);
 
 		if (result.length === 0) {
 			return res.status(200).json({
@@ -116,7 +116,7 @@ router.put('/edit', verifyJWT, async (req, res) => {
 	const sqlQuery = notesQueries.updateNote;
 
 	try {
-		await connection.query(sqlQuery, [noteTitle, noteContent, noteWeight, noteId, userId]);
+		await pool.query(sqlQuery, [noteTitle, noteContent, noteWeight, noteId, userId]);
 		return res.status(200).json({ message: 'Notatka zaktualizowana' });
 	} catch (err) {
 		notesErrorHandler(err, 500, 'Błąd podczas aktualizacji notatki:', `Błąd serwera: ${err.message}`, res);
@@ -134,7 +134,7 @@ router.delete('/delete', verifyJWT, async (req, res) => {
 	const sqlQuery = notesQueries.deleteNote;
 
 	try {
-		const [result] = await connection.query(sqlQuery, [noteId, userId]);
+		const [result] = await pool.query(sqlQuery, [noteId, userId]);
 
 		if (result.affectedRows === 0) {
 			return res.status(404).json({ message: 'Notatka nie została znaleziona' });

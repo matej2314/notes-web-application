@@ -1,6 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import connection from '../db.js';
+import pool from '../db.js';
 import { logger } from '../logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -33,7 +33,7 @@ const uploadFile = (req, res) => {
 		const sql = 'UPDATE users SET avatar=? where id=?';
 
 		try {
-			await connection.query(sql, [fileName, userId]);
+			await pool.query(sql, [fileName, userId]);
 			res.status(200).json({ message: 'Plik dodany.' });
 		} catch (dbErr) {
 			logger.error(dbErr.message);

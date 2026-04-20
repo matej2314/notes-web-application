@@ -37,7 +37,7 @@ export const createAvatarHandler = function (avFromDb) {
 
 	const imgEl = document.createElement('img');
 	imgEl.id = 'userAvatar--img';
-	imgEl.setAttribute('style', 'width: 100%, height: 100%;');
+	imgEl.setAttribute('style', 'width: 100%');
 
 	if (avFromDb) {
 		if (avFromDb.startsWith('http')) {

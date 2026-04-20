@@ -111,7 +111,7 @@ body > header nav button:active {
 /* ——— Główny układ (kolumny) ——— */
 .main_container {
 	width: min(1120px, 100%) !important;
-	margin: 1.25rem auto 0 !important;
+	margin: 1.25rem auto 5rem !important;
 	padding: 0 1rem !important;
 	box-sizing: border-box;
 	border: none !important;
@@ -169,8 +169,7 @@ body > header nav button:active {
 	}
 }
 
-.app-main-col h2,
-#addNote--img > h2:first-of-type {
+.app-main-col h2 {
 	font-size: 1.125rem !important;
 	font-weight: 700 !important;
 	letter-spacing: -0.02em;
@@ -279,6 +278,8 @@ body > header nav button:active {
 	box-shadow: var(--app-shadow);
 	padding: 1.25rem 1.25rem 2rem !important;
 	min-height: 320px;
+	align-items: flex-start !important;
+	text-align: left !important;
 }
 
 #userProfile--cont {
@@ -291,18 +292,15 @@ body > header nav button:active {
 	padding: 1.25rem 1rem 1.75rem !important;
 }
 
-#addNote--img > h2:first-child {
-	padding-bottom: 0.75rem;
-	margin-bottom: 0.5rem;
-	border-bottom: 1px solid rgba(148, 163, 184, 0.35);
-}
-
 #sort_cont {
+	width: 100%;
+	max-width: 100%;
 	border: 1px solid var(--app-border) !important;
 	background: rgba(248, 250, 252, 0.9) !important;
 	border-radius: var(--app-radius-sm) !important;
 	padding: 0.5rem 0.75rem !important;
 	align-items: center !important;
+	justify-content: flex-start !important;
 	flex-wrap: wrap;
 	gap: 0.5rem;
 }
@@ -339,8 +337,9 @@ body > header nav button:active {
 	border: 2px dashed rgba(148, 163, 184, 0.55) !important;
 	border-radius: var(--app-radius) !important;
 	background: rgba(248, 250, 252, 0.65) !important;
-	margin: 1rem auto !important;
+	margin: 1rem 0 !important;
 	padding: 1.25rem !important;
+	align-self: flex-start;
 }
 
 #addNote--img .addnote {
@@ -361,6 +360,7 @@ body > header nav button:active {
 #divNotes {
 	gap: 1rem;
 	align-content: flex-start;
+	justify-content: flex-start !important;
 }
 
 #divNotes .note-container {
@@ -383,8 +383,14 @@ body > header nav button:active {
 #divNotes .del_note--btn img {
 	padding: 6px;
 	border-radius: 10px;
-	background: rgba(255, 255, 255, 0.85);
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+#divNotes .pdf_note--btn:hover,
+#divNotes .edit_note--btn:hover,
+#divNotes .del_note--btn:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 18px 48px rgba(15, 23, 42, 0.16) !important;
 }
 
 /* ——— Stopka ——— */
