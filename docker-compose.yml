@@ -1,7 +1,5 @@
-version: "3.8"
-
 services:
-  notesApp:
+  notesapp:
     container_name: notes-web-app
     build:
       context: .

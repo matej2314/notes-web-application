@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY . .
 
-RUN rm -rf node_modules && npm install
+RUN npm install
 
 EXPOSE 8088
 
