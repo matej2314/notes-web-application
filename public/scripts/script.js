@@ -4,9 +4,8 @@ const btns = document.querySelectorAll('.btn');
 const btnLogin = document.getElementById('btn-login');
 const modalWindow = document.getElementById('login_window');
 const regWindow = document.getElementById('reg_form');
-const loginInput = document.getElementById('login_input');
 const loginEmailInput = document.getElementById('login_email--input');
-const passwdInput = document.getElementById('pass_input');
+const loginPassInput = document.getElementById('pass_input');
 const btnSubmit = document.getElementById('btn-submit');
 const mainSiteBtn = document.getElementById('mainSiteBtn');
 const allinputs = document.querySelectorAll('.input');
@@ -40,17 +39,14 @@ btns.forEach(btn =>
 
 btnSubmit.addEventListener('click', async function (e) {
 	e.preventDefault();
-	console.log('Przycisk kliknięty!');
 
 	
-	const userPassword = passwdInput.value;
+	const userPassword = loginPassInput.value;
 	const userEmail = loginEmailInput.value;
 
-	// Logowanie danych przed wysłaniem
-	console.log('Dane do przesłania:', { userEmail: userEmail, userpassword: userpassword });
 
 	// Walidacja hasła
-	if (!isValidPassword(passwdInput.value)) {
+	if (!isValidPassword(loginPassInput.value)) {
 		alert('Niepoprawne dane logowania.');
 		return;
 	}

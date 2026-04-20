@@ -9,6 +9,7 @@ import { logger } from '../logger.js';
 import { isValidPassword, isValidEmail, isValidUsername } from '../lib/validation/validationUtils.js';
 import notesErrorHandler from '../lib/notesErrorHandler.js';
 import jwtCookieOptions from '../lib/jwtCookieOptions.js';
+import { authQueries } from '../lib/queries/authQueries.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,7 +53,7 @@ const registerUser = async (req, res) => {
 			return;
 		}
 
-		const [existing] = await connection.query('SELECT email FROM users WHERE email = ?', [reg_email]);
+		const [existing] = await connection.query(authQueries.checkEmailExists, [reg_email]);
 		if (existing.length > 0) {
 			return res.status(400).send('Ten adres e-mail jest już zarejestrowany!');
 		}
@@ -60,7 +61,7 @@ const registerUser = async (req, res) => {
 		const hashedPasswd = await bcrypt.hash(reg_password, 10);
 		const userId = uuidv4();
 
-		await connection.query('INSERT INTO users SET ?', {
+		await connection.query(authQueries.registerUser, {
 			id: userId,
 			name: reg_username,
 			email: reg_email,
@@ -85,7 +86,7 @@ const loginUser = async (req, res) => {
 	}
 
 	try {
-		const [results] = await connection.query('SELECT id, name, email, password FROM users WHERE email = ?', [email]);
+		const [results] = await connection.query(authQueries.loginUser, [email]);
 
 		if (results.length === 0) {
 			return res.status(400).json({ message: 'Niepoprawne dane logowania.' });
@@ -123,17 +124,17 @@ const changeEmail = async (req, res) => {
 	}
 
 	try {
-		const [emailTaken] = await connection.query('SELECT id FROM users WHERE email = ? AND id != ?', [newEmail, userId]);
+		const [emailTaken] = await connection.query(authQueries.checkUserExists, [newEmail, userId]);
 		if (emailTaken.length > 0) {
 			return res.status(400).json({ message: 'Ten adres e-mail jest już zarejestrowany!' });
 		}
 
-		const [userRows] = await connection.query('SELECT id FROM users WHERE id = ? AND name = ? AND email = ?', [userId, username, email]);
+		const [userRows] = await connection.query(authQueries.checkUserData, [userId, username, email]);
 		if (userRows.length === 0) {
 			return res.status(400).json({ message: 'Podano nieprawidłowe dane użytkownika' });
 		}
 
-		const [updateResult] = await connection.query('UPDATE users SET email = ? WHERE id = ?', [newEmail, userId]);
+		const [updateResult] = await connection.query(authQueries.updateEmail, [newEmail, userId]);
 		if (updateResult.affectedRows === 0) {
 			return res.status(400).json({ message: 'Nie udało się zmienić adresu e-mail' });
 		}
@@ -153,7 +154,7 @@ const changePass = async (req, res) => {
 	}
 
 	try {
-		const [rows] = await connection.query('SELECT password FROM users WHERE id = ? AND name = ?', [userId, userName]);
+		const [rows] = await connection.query(authQueries.checkPassword, [userId, userName]);
 
 		if (rows.length === 0) {
 			return res.status(400).json({ message: 'Nieprawidłowe dane użytkownika.' });
@@ -168,7 +169,7 @@ const changePass = async (req, res) => {
 
 		const hashedPasswd = await bcrypt.hash(newPass, 10);
 
-		const [updateResult] = await connection.query('UPDATE users SET password = ? WHERE id = ?', [hashedPasswd, userId]);
+		const [updateResult] = await connection.query(authQueries.updatePassword, [hashedPasswd, userId]);
 		if (updateResult.affectedRows === 0) {
 			return res.status(400).json({ message: 'Nie udało się zmienić hasła' });
 		}
