@@ -1,13 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const authController = require('../controllers/auth');
-const verifyJWT = require('../controllers/verifyJWT');
+import authController from '../controllers/auth.js';
+import { verifyToken } from '../controllers/verifyJWT.js';
 
-const jwtCookieOptions = {
-	httpOnly: true,
-	secure: false,
-	maxAge: 86400000,
-};
+const verifyJWT = verifyToken;
 
 router.post('/register', authController.registerUser);
 router.post('/login', authController.loginUser);
@@ -15,4 +11,4 @@ router.post('/usermail', verifyJWT, authController.changeEmail);
 router.post('/userpass', verifyJWT, authController.changePass);
 router.post('/logout', authController.logoutUser);
 
-module.exports = router;
+export default router;

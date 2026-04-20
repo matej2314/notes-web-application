@@ -1,11 +1,16 @@
-const dotenv = require('dotenv').config({ path: '../../../.env' });
-const logger = require('../logger');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import { logger } from '../logger.js';
+import jwt from 'jsonwebtoken';
 
-const jwt = require('jsonwebtoken');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const verifyToken = (req, res, next) => {
+export const verifyToken = (req, res, next) => {
 	const token = req.cookies['SESSID'];
 
 	if (!token) {
@@ -23,5 +28,3 @@ const verifyToken = (req, res, next) => {
 		next();
 	});
 };
-
-module.exports = verifyToken;

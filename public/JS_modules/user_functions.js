@@ -78,7 +78,7 @@ export const changePassFr = async function (req, res) {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ name, oldPass, newPass }),
+			body: JSON.stringify({ userName: name, oldPass: oldPass, newPass: newPass }),
 		});
 
 		if (!response.ok) {

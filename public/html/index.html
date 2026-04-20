@@ -11,7 +11,15 @@
 	<meta name="google-signin-client_id" content="383614892447-7ml5t7fjfqq2be95b96i362og8tj2ks8.apps.googleusercontent.com">
 	<title>Note Web Application v.1</title>
 	<link rel="stylesheet" href="/css/styles.css" />
+	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/css/app-modern.css" />
 	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
 		html,
 		body {
 			margin: 0;
@@ -25,7 +33,7 @@
 		}
 	</style>
 </head>
-<body class="w-screen h-hdvh bg-cyan-100/75 flex flex-col items-center justify-center font-roboto z-0">
+<body class="w-screen min-h-screen flex flex-col items-center justify-center font-roboto z-0">
 	<header class="w-full h-fit flex flex-col items-center justify-center">
 		<img class="h-60 w-3/4 rounded-lg" alt="pióro i notes" src="../images/fountain-pen-1851096_1920.jpg">
 		<nav class="w-3/4 h-fit flex flex-row items-center justify-between max-sm:w-full max-sm:justify-start max-sm:items-start">
@@ -37,18 +45,16 @@
 			</ul>
 		</nav>
 	</header>
-	<form action="">
-		<div id="login_window" tabindex="-1" class=" invisible w-fit h-fit fixed flex flex-col justify-start items-center z-10 border-4 border-white pt-2 pl-10 pr-10 pb-5 bg-[#585243] text-[#dcecf5] rounded-lg">
+	<div id="login_window" tabindex="-1" class="invisible w-fit h-fit fixed flex flex-col justify-start items-center z-10 border-4 border-white pt-2 pl-10 pr-10 pb-5 bg-[#585243] text-[#dcecf5] rounded-lg">
+		<form action="">
 			<p class="mb-5 text-xl uppercase">Logowanie</p>
-			<button id="google-login-btn">Zaloguj się przez Google</button>
-			<label id="login_input--label" for="login_input" class="my-5">Podaj login:</label>
-			<input id="login_input" class="border-2 border-stone-950 text-stone-950 pl-2 input" type="text" minlength="5" maxlength="30" required />
+			<button type="button" id="google-login-btn">Zaloguj się przez Google</button>
 			<label id="login_email--input_label" for="login_email--input" class="my-5">Podaj email:</label>
 			<input type="email" name="login_email--input" id="login_email--input" class="mb-5 border-2 border-stone-950 text-stone-950 pl-2 input" />
 			<label class="mb-5" id="login_input--label" for="pass_input">Podaj hasło:</label>
 			<input id="pass_input" class="border-2 border-stone-950 text-stone-950 pl-2 input" type="password" minlength="10" maxlength="30" required />
 			<input type="submit" id="btn-submit" class="mt-10 bg-[#6e97ab] p-2 rounded-lg hover:bg-[#3e6173] active:bg-[#3e6173] active:translate-y-1" value="Zaloguj" />
-	</form>
+		</form>
 	</div>
 	<div id="reg_form" class="w-fit h-fit fixed flex flex-col justify-start items-center z-10 border-4 border-white pt-2 pl-10 pr-10 pb-5 bg-[#585243] text-[#dcecf5] rounded-lg mb-36 invisible">
 		<p class="mb-5 text-xl uppercase">Rejestracja</p>
@@ -64,48 +70,51 @@
 			<input type="submit" id="reg_submit--btn" class="mt-10 bg-[#6e97ab] p-2 rounded-lg hover:bg-[#3e6173] active:bg-[#3e6173] active:translate-y-1" value="Rejestruj" />
 		</form>
 	</div>
-	<div class="w-3/4 h-screen flex flex-row justify-center main_container m-0 p-0">
-		<div class=" h-full w-3/4 border-2 border-stone-950 flex flex-col rounded-tl-lg justify-start align-start  bg-[#dcecf5]">
-			<h2 class="w-full h-fit flex flex-row justify-center text-lg font-semibold">Twoje notatki:</h2>
-			<div class="w-full h-fit flex flex-col justify-start items-center">
-				<p class="w-full h-full flex flex-row justify-center mt-10 font-roboto text-xl ">Witam na stronie umożliwiającej zarządzanie własnymi notatkami.</p>
-				<h2 class="mt-10 text-lg underline decoration-solid">Po zalogowaniu będziesz mógł:</h2>
-				<ul class="w-fit h-fit flex flex-col items-center list-disc ml-20 mt-5 leading-loose">
-					<li>stworzyć swój profil użytkownika,</li>
-					<li>dodawać notatki,</li>
-					<li>edytować notatki,</li>
-					<li>usuwać notatki,</li>
-					<li>zapisywać wybrane przez siebie notatki do pliku PDF.</li>
+	<div class="w-3/4 flex flex-col gap-5 bg-transparent">
+		<div class="w-3/4 flex flex-row justify-center main_container m-0 p-0">
+			<div class="app-main-col w-3/4 border-2 border-stone-950 flex flex-col rounded-tl-lg justify-start align-start bg-[#dcecf5]">
+				<h2 class="w-full h-fit flex flex-row justify-center text-lg font-semibold">Twoje notatki:</h2>
+				<div class="w-full h-fit flex flex-col justify-start items-center">
+					<p class="w-full h-full flex flex-row justify-center mt-10 font-roboto text-xl ">Witam na stronie umożliwiającej zarządzanie własnymi notatkami.</p>
+					<h2 class="mt-10 text-lg underline decoration-solid">Po zalogowaniu będziesz mógł:</h2>
+					<ul class="w-fit h-fit flex flex-col items-center list-disc ml-20 mt-5 leading-loose">
+						<li>stworzyć swój profil użytkownika,</li>
+						<li>dodawać notatki,</li>
+						<li>edytować notatki,</li>
+						<li>usuwać notatki,</li>
+						<li>zapisywać wybrane przez siebie notatki do pliku PDF.</li>
+					</ul>
+					</p>
+					<h2 class="w-full h-fit flex flex-row justify-center mt-10 text-lg underline decoration-solid">Technologie wykorzystane przy tworzeniu strony:</h2>
+					<ul class="w-fit h-fit flex flex-col items-center list-disc ml-20 mt-5 leading-loose">
+						<li>HTML</li>
+						<li>CSS (Tailwind CSS)</li>
+						<li>JavaScript</li>
+						<li>Node.js</li>
+					</ul>
+					<p class="mt-10">Załóż konto i sprawdź funkcjonowanie aplikacji samodzielnie!</p>
+					<p>Testowe dane: testowy/Test123456!!</p>
+				</div>
+			</div>
+			<div class="app-side-col w-3/12 border-2 border-stone-950 rounded-tr-lg flex flex-col items-center bg-[#dcecf5]">
+				<h2 class="w-full h-fit flex flex-row justify-center underline decoration-solid text-lg font-semibold ">Twój profil:</h2>
+				<div class="w-28 h-28 mt-3 border-2 flex flex-col justify-center items-center justify-self-center border-stone-950 rounded-full overflow-hidden">
+					<p class="w-fit h-fit flex flex-col">Twój avatar</p>
+				</div>
+				<ul class=" w-full h-fit mt-5 flex flex-col justify-center items-center">
+					<li class="w-full h-fit flex flex-row justify-center btn"><button>Dodaj notatkę</button></li>
+					<li class="w-full h-fit flex flex-row justify-center btn"><button>Zmień adres e-mail</button></li>
+					<li class="w-full h-fit flex flex-row justify-center btn"><button>Zmień hasło</button></li>
+					<li class="w-full h-fit flex flex-row justify-center btn"><button>Wyloguj</button></li>
 				</ul>
-				</p>
-				<h2 class="w-full h-fit flex flex-row justify-center mt-10 text-lg underline decoration-solid">Technologie wykorzystane przy tworzeniu strony:</h2>
-				<ul class="w-fit h-fit flex flex-col items-center list-disc ml-20 mt-5 leading-loose">
-					<li>HTML</li>
-					<li>CSS (Tailwind CSS)</li>
-					<li>JavaScript</li>
-					<li>Node.js</li>
-				</ul>
-				<p class="mt-10">Załóż konto i sprawdź funkcjonowanie aplikacji samodzielnie!</p>
-				<p>Testowe dane: testowy/Test123456!!</p>
 			</div>
 		</div>
-		<div class="w-3/12 h-full border-2 border-stone-950 rounded-tr-lg flex flex-col items-center bg-[#dcecf5]">
-			<h2 class="w-full h-fit flex flex-row justify-center underline decoration-solid text-lg font-semibold ">Twój profil:</h2>
-			<div class="w-28 h-28 mt-3 border-2 flex flex-col justify-center items-center justify-self-center border-stone-950 rounded-full overflow-hidden">
-				<p class="w-fit h-fit flex flex-col">Twój avatar</p>
-			</div>
-			<ul class=" w-full h-fit mt-5 flex flex-col justify-center items-center">
-				<li class="w-full h-fit flex flex-row justify-center btn"><button>Dodaj notatkę</button></li>
-				<li class="w-full h-fit flex flex-row justify-center btn"><button>Zmień adres e-mail</button></li>
-				<li class="w-full h-fit flex flex-row justify-center btn"><button>Zmień hasło</button></li>
-				<li class="w-full h-fit flex flex-row justify-center btn"><button>Wyloguj</button></li>
-			</ul>
+		<div>
+		<div class="footer_container">
+			<h2 class="h-fit w-fit font-roboto font-medium pb-2 pt-2">Copyright@Mateusz Śliwowski - mateo2314</h2>
+		</div>
 		</div>
 	</div>
-	<div class="w-3/4 h-fit border-2 border-stone-950 flex flex-row justify-center rounded-bl-lg rounded-br-lg footer_container bg-[#9abdcd]">
-		<h2 class="h-fit w-fit font-roboto font-medium pb-2 pt-2">Copyright@Mateusz Śliwowski - mateo2314</h2>
-	</div>
-
 	<script src="../scripts/script.js"></script>
 	<script src="../JS_modules//register_Module.js"></script>
 </body>

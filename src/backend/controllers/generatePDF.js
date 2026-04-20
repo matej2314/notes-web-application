@@ -1,13 +1,18 @@
 'use strict';
 
-const PDFDocument = require('pdfkit');
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import PDFDocument from 'pdfkit';
+import { logger } from '../logger.js';
+import { v4 as uuidv4 } from 'uuid';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const datetime = new Date().toLocaleString('pl');
-const logger = require('../logger');
 
 const generatePDF = async (req, res) => {
-	console.log('Dane przekazane na endpoint PDF:', req.body);
 	const userId = req.userId;
 	const noteId = req.body.noteId;
 	const noteTitle = req.body.noteTitle;
@@ -16,11 +21,11 @@ const generatePDF = async (req, res) => {
 
 	if (!userId || !noteId || !noteTitle || !noteContent || !noteDate) {
 		logger.error('Brak danych do PDF');
-		res.status(400).json({ message: 'Brak danych do PDF.' });
+		return res.status(400).json({ message: 'Brak danych do PDF.' });
 	}
 
 	const doc = new PDFDocument();
-	const filePath = path.join(__dirname, 'notatka.pdf');
+	const filePath = path.join(__dirname, `note-${userId}-${uuidv4()}.pdf`);
 	const fileStream = fs.createWriteStream(filePath);
 	doc.pipe(fileStream);
 
@@ -49,14 +54,17 @@ const generatePDF = async (req, res) => {
 			if (err) {
 				logger.error('Wystąpił błąd podczas wysyłania pliku:', err.message);
 				res.status(500).json({ message: 'Błąd pobierania pliku PDF' });
+				return;
 			} else {
 				console.log('Plik PDF został wysłany');
 
 				fs.unlink(filePath, err => {
 					if (err) {
 						console.log('Wystąpił błąd:', err.message);
+						return;
 					} else {
 						console.log('Plik PDF został usunięty z serwera.');
+						return;
 					}
 				});
 			}
@@ -64,4 +72,4 @@ const generatePDF = async (req, res) => {
 	});
 };
 
-module.exports = generatePDF;
+export default generatePDF;

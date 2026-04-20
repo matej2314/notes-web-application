@@ -1,10 +1,18 @@
-const express = require('express');
+import express from 'express';
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+import bodyParser from 'body-parser';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+import { verifyToken } from '../controllers/verifyJWT.js';
+import uploadFile from '../controllers/uploadFiles.js';
+import sendAvatar from '../controllers/sendAvatar.js';
+
 const router = express.Router();
-const path = require('path');
-const bodyParser = require('body-parser');
-const verifyJWT = require('../controllers/verifyJWT');
-const uploadFile = require('../controllers/uploadFiles');
-const sendAvatar = require('../controllers/sendAvatar');
+
+const verifyJWT = verifyToken;
 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
@@ -22,4 +30,4 @@ router.get('/main', verifyJWT, (req, res) => {
 router.post('/upload', verifyJWT, uploadFile);
 router.get('/avatar', verifyJWT, sendAvatar);
 
-module.exports = router;
+export default router;

@@ -694,8 +694,8 @@ video {
   height: 100%;
 }
 
-.h-screen {
-  height: 100vh;
+.min-h-screen {
+  min-height: 100vh;
 }
 
 .w-1\/4 {
@@ -797,6 +797,10 @@ video {
   justify-content: stretch;
 }
 
+.gap-5 {
+  gap: 1.25rem;
+}
+
 .justify-self-center {
   justify-self: center;
 }
@@ -875,8 +879,8 @@ video {
   background-color: rgb(220 236 245 / var(--tw-bg-opacity));
 }
 
-.bg-cyan-100\/75 {
-  background-color: rgb(207 250 254 / 0.75);
+.bg-transparent {
+  background-color: transparent;
 }
 
 .p-0 {
@@ -987,6 +991,10 @@ video {
 
 .decoration-solid {
   text-decoration-style: solid;
+}
+
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
 .hover\:bg-\[\#3e6173\]:hover {

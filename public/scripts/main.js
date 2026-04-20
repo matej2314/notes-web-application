@@ -29,9 +29,9 @@ const addNote = async function () {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				notetitle: noteTitleValue,
-				notetext: noteTextValue,
-				weight: noteWeightValue,
+				noteTitle: noteTitleValue,
+				noteText: noteTextValue,
+				noteWeight: noteWeightValue,
 			}),
 			credentials: 'include',
 		});

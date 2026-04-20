@@ -1,43 +1,51 @@
-require('dotenv').config({ path: '../../.env' });
-const logger = require('./logger');
-const mysql = require('mysql2');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import mysql from 'mysql2/promise';
+import { logger } from './logger.js';
 
-let connection;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
-const handleDisconnect = () => {
-	connection = mysql.createConnection({
-		host: process.env.DB_HOST,
-		port: process.env.DB_PORT,
-		user: process.env.DB_USER,
+const requiredDbEnv = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+function validateDbEnv() {
+	const missing = requiredDbEnv.filter((key) => !process.env[key]?.trim());
+	if (missing.length) {
+		throw new Error(
+			`Brak wymaganych zmiennych środowiskowych bazy: ${missing.join(', ')}`,
+		);
+	}
+	const port = process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306;
+	if (!Number.isInteger(port) || port < 1 || port > 65535) {
+		throw new Error(
+			`Nieprawidłowy DB_PORT: "${process.env.DB_PORT}" (oczekiwano 1–65535).`,
+		);
+	}
+	return {
+		host: process.env.DB_HOST.trim(),
+		port,
+		user: process.env.DB_USER.trim(),
 		password: process.env.DB_PASSWORD,
-		database: process.env.DB_NAME,
-	});
+		database: process.env.DB_NAME.trim(),
+	};
+}
+dotenv.config({ path: path.join(__dirname, '../../.env') });
+const dbConfig = validateDbEnv();
 
-	connection.connect((error) => {
-		if (error) {
-			console.error('Error connecting to DB:', error);
-			logger.error(`Error connecting to DB: ${error.message}`);
-			
-			setTimeout(handleDisconnect, 5000);
-		} else {
-			console.log('Connected to MySQL DB');
-			logger.info('MYSQL_DB_CONNECTED');
-		}
-	});
+const pool = mysql.createPool({
+	host: dbConfig.host,
+	port: dbConfig.port,
+	user: dbConfig.user,
+	password: dbConfig.password,
+	database: dbConfig.database,
+	waitForConnections: true,
+	connectionLimit: 10,
+	queueLimit: 0,
+});
 
-	
-	connection.on('error', (error) => {
-		logger.error(`DB Connection Error: ${error.message}`);
-		if (error.code === 'PROTOCOL_CONNECTION_LOST' || error.code === 'ECONNRESET') {
-			console.log('Reconnecting to MySQL...');
-			handleDisconnect(); // Ponowne nawiązanie połączenia
-		} else {
-			throw error;
-		}
-	});
-};
+pool.on('connection', (connection) => {
+	logger.log('New DB Connection established.');
+});
 
-
-handleDisconnect();
-
-module.exports = connection;
+export default pool;

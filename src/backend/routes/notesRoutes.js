@@ -1,22 +1,24 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const path = require('path');
-const connection = require('../db');
-const bodyParser = require('body-parser');
-const generatePDF = require('../controllers/generatePDF');
-const verifyJWT = require('../controllers/verifyJWT');
-const { v4: uuidv4 } = require('uuid');
-const formattedDate = require('../backend_modules/formattedDate');
-const logger = require('../logger');
+import connection from '../db.js';
+import bodyParser from 'body-parser';
+import generatePDF from '../controllers/generatePDF.js';
+import { verifyToken } from '../controllers/verifyJWT.js';
+import { v4 as uuidv4 } from 'uuid';
+import formattedDate from '../backend_modules/formattedDate.js';
+import { notesQueries } from '../lib/queries/notesQueries.js';
+import notesErrorHandler from '../lib/notesErrorHandler.js';
 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
-router.post('/', verifyJWT, (req, res) => {
+const verifyJWT = verifyToken;
+
+router.post('/', verifyJWT, async (req, res) => {
 	const userId = req.userId;
-	const noteTitle = req.body.notetitle;
-	const noteContent = req.body.notetext;
-	const noteWeight = req.body.weight;
+	const noteTitle = req.body.noteTitle;
+	const noteContent = req.body.noteText;
+	const noteWeight = req.body.noteWeight;
 
 	if (!userId || !noteContent || !noteTitle || noteContent.trim() === '') {
 		return res.status(400).send('Prześlij poprawne dane!');
@@ -25,39 +27,65 @@ router.post('/', verifyJWT, (req, res) => {
 	const id = uuidv4();
 	const date = formattedDate(new Date());
 
-	const sqlQuery = 'INSERT INTO notes (id, user_id, title, note, weight, date) VALUES(?,?,?,?,?,?)';
+	const sqlQuery = notesQueries.saveNote;
 
-	connection.query(sqlQuery, [id, userId, noteTitle, noteContent, noteWeight, date], (err, result) => {
-		if (err) {
-			logger.error('Błąd podczas dodawania notatki:', err.message);
-
-			return res.status(500).send(`Błąd serwera: ${err.message}`);
-		}
+	try {
+		await connection.query(sqlQuery, [id, userId, noteTitle, noteContent, noteWeight, date]);
 		res.status(201).json({
 			message: 'Notatka dodana pomyślnie!',
 			noteId: id,
 		});
-	});
+	} catch (err) {
+		notesErrorHandler(err, 500, 'Błąd podczas dodawania notatki:', `Błąd serwera: ${err.message}`, res);
+	}
 });
 
-router.get('/', verifyJWT, (req, res) => {
+router.get('/all', verifyJWT, async (req, res) => {
 	const userId = req.userId;
-	const noteId = req.body.noteId;
+
+	if (!userId) {
+		return res.status(400).send('Brak danych');
+	}
+
+	const sqlQuery = notesQueries.getAllNotes;
+
+	try {
+		const [rows] = await connection.query(sqlQuery, [userId]);
+		if (rows.length === 0) {
+			return res.status(200).json({ notes: [] });
+		}
+
+		res.status(200).json({
+			notes: rows,
+		});
+	} catch (err) {
+		notesErrorHandler(err, 500, 'Błąd podczas pobierania danych:', `Błąd serwera: ${err.message}`, res);
+	}
+});
+
+router.get('/:noteId', verifyJWT, async (req, res) => {
+	const userId = req.userId;
+	const noteId = req.params.noteId;
 
 	if (!userId || !noteId) {
 		return res.status(400).send('Prześlij poprawne dane!');
 	}
 
-	const sqlQuery = ` SELECT * FROM notes WHERE id = ? AND user_id = ? `;
+	const sqlQuery = notesQueries.getNote;
 
-	connection.query(sqlQuery, [noteId, userId], (err, result) => {
-		if (err) {
-			logger.error(err.message);
-			return res.status(500).send('Błąd pobierania danych:', err.message);
-		}
+	try {
+		const [result] = await connection.query(sqlQuery, [noteId, userId]);
 
 		if (result.length === 0) {
-			return res.status(404).send('Notatka nie została znaleziona');
+			return res.status(200).json({
+				message: 'Notatka nie została znaleziona',
+				id: noteId,
+				userId: userId,
+				noteTitle: null,
+				noteText: null,
+				noteWeight: null,
+				date: null,
+			});
 		}
 
 		const note = result[0];
@@ -69,37 +97,15 @@ router.get('/', verifyJWT, (req, res) => {
 			noteWeight: note.weight,
 			date: note.date,
 		});
-	});
-});
-
-router.get('/all', verifyJWT, (req, res) => {
-	const userId = req.userId;
-
-	if (!userId) {
-		return res.status(400).send('Brak danych');
+	} catch (err) {
+		notesErrorHandler(err, 500, 'Błąd pobierania danych:', `Błąd serwera: ${err.message}`, res);
 	}
-
-	const sqlQuery = `SELECT * FROM notes WHERE user_id=?`;
-
-	connection.query(sqlQuery, [userId], (err, rows) => {
-		if (err) {
-			logger.error('Błąd podczas pobierania danych:', err.message);
-			return res.status(500).send('Błąd serwera.');
-		}
-		if (rows.length === 0) {
-			return res.status(400).send('Brak notatek użytkownika.');
-		}
-
-		res.status(200).json({
-			notes: rows,
-		});
-	});
 });
 
-router.put('/edit', verifyJWT, (req, res) => {
+router.put('/edit', verifyJWT, async (req, res) => {
 	const noteId = req.body.noteId;
-	const noteTitle = req.body.notetitle;
-	const noteContent = req.body.notetext;
+	const noteTitle = req.body.noteTitle;
+	const noteContent = req.body.noteText;
 	const noteWeight = req.body.noteWeight;
 	const userId = req.userId;
 
@@ -107,18 +113,17 @@ router.put('/edit', verifyJWT, (req, res) => {
 		return res.status(400).json({ message: 'Niepoprawne dane' });
 	}
 
-	const sqlQuery = 'UPDATE notes SET title = ?, note = ?, weight = ? WHERE id = ? AND user_id = ?';
+	const sqlQuery = notesQueries.updateNote;
 
-	connection.query(sqlQuery, [noteTitle, noteContent, noteWeight, noteId, userId], (err, result) => {
-		if (err) {
-			logger.error('Błąd podczas aktualizacji notatki', err.message);
-			return res.status(500).json({ message: 'Błąd serwera' });
-		}
+	try {
+		await connection.query(sqlQuery, [noteTitle, noteContent, noteWeight, noteId, userId]);
 		return res.status(200).json({ message: 'Notatka zaktualizowana' });
-	});
+	} catch (err) {
+		notesErrorHandler(err, 500, 'Błąd podczas aktualizacji notatki:', `Błąd serwera: ${err.message}`, res);
+	}
 });
 
-router.delete('/delete', verifyJWT, (req, res) => {
+router.delete('/delete', verifyJWT, async (req, res) => {
 	const userId = req.userId;
 	const noteId = req.body.noteId;
 
@@ -126,21 +131,20 @@ router.delete('/delete', verifyJWT, (req, res) => {
 		return res.status(400).send('Dane niepoprawne');
 	}
 
-	const sqlQuery = `DELETE FROM notes WHERE id=? AND user_id=?`;
+	const sqlQuery = notesQueries.deleteNote;
 
-	connection.query(sqlQuery, [noteId, userId], (err, result) => {
-		if (err) {
-			logger.error('Błąd podczas usuwania danych:', err.message);
-			return res.status(500).send('Błąd serwera', err.message);
-		}
+	try {
+		const [result] = await connection.query(sqlQuery, [noteId, userId]);
 
 		if (result.affectedRows === 0) {
 			return res.status(404).json({ message: 'Notatka nie została znaleziona' });
 		}
 		return res.status(200).json({ message: 'Notatka usunięta pomyślnie' });
-	});
+	} catch (err) {
+		notesErrorHandler(err, 500, 'Błąd podczas usuwania danych:', `Błąd serwera: ${err.message}`, res);
+	}
 });
 
 router.post('/generate-pdf', verifyJWT, generatePDF);
 
-module.exports = router;
+export default router;

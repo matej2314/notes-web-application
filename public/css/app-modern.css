@@ -1,0 +1,581 @@
+/* Notes Web App — warstwa wizualna (nad Tailwind) */
+
+:root {
+	--app-bg0: #0f172a;
+	--app-bg1: #1e293b;
+	--app-surface: rgba(255, 255, 255, 0.06);
+	--app-surface-2: rgba(255, 255, 255, 0.92);
+	--app-border: rgba(148, 163, 184, 0.35);
+	--app-text: #0f172a;
+	--app-text-muted: #64748b;
+	--app-accent: #2563eb;
+	--app-accent-hover: #1d4ed8;
+	--app-ring: rgba(37, 99, 235, 0.35);
+	--app-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+	--app-radius: 1rem;
+	--app-radius-sm: 0.625rem;
+	--app-font: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+}
+
+.visible {
+	visibility: visible !important;
+}
+
+html {
+	scroll-behavior: smooth;
+	overflow-x: hidden;
+	scrollbar-width: none;
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(37, 99, 235, 0.22), transparent), radial-gradient(900px 500px at 100% 0%, rgba(14, 165, 233, 0.18), transparent), linear-gradient(165deg, var(--app-bg0) 0%, #0c1222 48%, var(--app-bg1) 100%) !important;
+}
+
+body.w-screen,
+body {
+	min-height: 100vh;
+	min-height: 100dvh;
+	font-family: var(--app-font) !important;
+	background: radial-gradient(1200px 600px at 10% -10%, rgba(37, 99, 235, 0.22), transparent), radial-gradient(900px 500px at 100% 0%, rgba(14, 165, 233, 0.18), transparent), linear-gradient(165deg, var(--app-bg0) 0%, #0c1222 48%, var(--app-bg1) 100%) !important;
+	color: var(--app-text);
+}
+
+/* ——— Nagłówek i hero ——— */
+body > header {
+	width: min(1120px, 100%) !important;
+	padding: 1.25rem 1rem 0;
+	box-sizing: border-box;
+}
+
+body > header img[alt='pióro i notes'] {
+	width: 100% !important;
+	max-height: 220px;
+	object-fit: cover;
+	border-radius: var(--app-radius);
+	box-shadow: var(--app-shadow);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body > header nav {
+	width: 100% !important;
+	max-width: 1120px;
+	margin-top: 1rem;
+}
+
+body > header nav ul {
+	display: flex !important;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center !important;
+	gap: 0.35rem 0.5rem;
+	padding: 0.5rem 0.75rem !important;
+	margin: 0 auto !important;
+	list-style: none;
+	background: rgba(255, 255, 255, 0.07) !important;
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, 0.12) !important;
+	border-radius: 999px !important;
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+body > header nav ul li {
+	width: auto !important;
+	padding: 0 0.25rem;
+	color: rgba(226, 232, 240, 0.88);
+	font-size: 0.9rem;
+	font-weight: 500;
+}
+
+body > header nav button {
+	appearance: none;
+	border: none;
+	background: transparent;
+	color: #e2e8f0 !important;
+	font-weight: 600;
+	font-size: 0.9rem;
+	padding: 0.55rem 1rem !important;
+	border-radius: 999px;
+	transition:
+		background 0.15s ease,
+		color 0.15s ease,
+		transform 0.1s ease;
+}
+
+body > header nav button:hover {
+	background: rgba(255, 255, 255, 0.12);
+	color: #fff !important;
+}
+
+body > header nav button:active {
+	transform: scale(0.98);
+}
+
+/* ——— Główny układ (kolumny) ——— */
+.main_container {
+	width: min(1120px, 100%) !important;
+	margin: 1.25rem auto 0 !important;
+	padding: 0 1rem !important;
+	box-sizing: border-box;
+	border: none !important;
+	background: transparent !important;
+	border-radius: var(--app-radius) !important;
+	overflow: visible;
+	box-shadow: none !important;
+	gap: 0 !important;
+}
+
+.app-main-col {
+	flex: 1 1 0 !important;
+	min-width: 0 !important;
+	width: auto !important;
+	border: 1px solid var(--app-border) !important;
+	border-right: none !important;
+	border-radius: var(--app-radius) 0 0 var(--app-radius) !important;
+	background: var(--app-surface-2) !important;
+	box-shadow: var(--app-shadow);
+	padding: 1.5rem 1.75rem 2rem !important;
+}
+
+.app-side-col {
+	flex: 0 0 min(280px, 34%) !important;
+	width: auto !important;
+	border: 1px solid var(--app-border) !important;
+	border-radius: 0 var(--app-radius) var(--app-radius) 0 !important;
+	background: linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%) !important;
+	box-shadow: var(--app-shadow);
+	padding: 1.25rem 1rem 1.75rem !important;
+}
+
+@media (max-width: 900px) {
+	.main_container {
+		flex-direction: column !important;
+		height: auto !important;
+	}
+
+	.app-main-col {
+		border-radius: var(--app-radius) var(--app-radius) 0 0 !important;
+		border-right: 1px solid var(--app-border) !important;
+	}
+
+	.app-side-col {
+		border-radius: 0 0 var(--app-radius) var(--app-radius) !important;
+		border-top: none !important;
+	}
+
+	#addNote--img {
+		border-radius: var(--app-radius) var(--app-radius) 0 0 !important;
+	}
+
+	#userProfile--cont {
+		border-radius: 0 0 var(--app-radius) var(--app-radius) !important;
+	}
+}
+
+.app-main-col h2,
+#addNote--img > h2:first-of-type {
+	font-size: 1.125rem !important;
+	font-weight: 700 !important;
+	letter-spacing: -0.02em;
+	color: var(--app-text) !important;
+	text-decoration: none !important;
+	border-bottom: none !important;
+}
+
+.app-main-col .underline {
+	text-decoration: none !important;
+	font-size: 1rem !important;
+	font-weight: 600 !important;
+	color: var(--app-text-muted) !important;
+	margin-top: 1.5rem !important;
+}
+
+.app-main-col ul.list-disc {
+	list-style: none !important;
+	margin-left: 0 !important;
+	padding-left: 0 !important;
+	gap: 0.35rem;
+}
+
+.app-main-col ul.list-disc li {
+	position: relative;
+	padding-left: 1.35rem;
+	color: var(--app-text);
+	line-height: 1.65 !important;
+}
+
+.app-main-col ul.list-disc li::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0.55em;
+	width: 6px;
+	height: 6px;
+	border-radius: 999px;
+	background: var(--app-accent);
+	opacity: 0.85;
+}
+
+.app-main-col p {
+	color: var(--app-text);
+	max-width: 52ch;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+/* Panel profilu — przyciski */
+#userProfile--cont ul li,
+.app-side-col ul li {
+	width: 100% !important;
+	margin-bottom: 0.35rem;
+}
+
+#userProfile--cont button,
+.app-side-col ul button,
+.main_container .btn button {
+	width: 100%;
+	max-width: 240px;
+	padding: 0.65rem 1rem !important;
+	border-radius: var(--app-radius-sm);
+	border: 1px solid var(--app-border);
+	background: #fff;
+	color: var(--app-text) !important;
+	font-weight: 600;
+	font-size: 0.875rem;
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+	transition:
+		border-color 0.15s,
+		box-shadow 0.15s,
+		background 0.15s;
+}
+
+#userProfile--cont button:hover,
+.app-side-col ul button:hover,
+.main_container .btn button:hover {
+	border-color: rgba(37, 99, 235, 0.45);
+	box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+}
+
+#profile_img--cont,
+.app-side-col .rounded-full,
+.app-side-col [class*='rounded-full'] {
+	border: 3px solid rgba(37, 99, 235, 0.35) !important;
+	background: linear-gradient(145deg, #f8fafc, #e2e8f0) !important;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+#userProfile--cont h2,
+.app-side-col h2 {
+	text-decoration: none !important;
+	letter-spacing: -0.02em;
+}
+
+/* ——— Strona notatek (main_page) ——— */
+#addNote--img {
+	flex: 1 1 0 !important;
+	min-width: 0 !important;
+	border: 1px solid var(--app-border) !important;
+	border-radius: var(--app-radius) 0 0 var(--app-radius) !important;
+	border-right: none !important;
+	background: var(--app-surface-2) !important;
+	box-shadow: var(--app-shadow);
+	padding: 1.25rem 1.25rem 2rem !important;
+	min-height: 320px;
+}
+
+#userProfile--cont {
+	flex: 0 0 min(280px, 34%) !important;
+	border: 1px solid var(--app-border) !important;
+	border-radius: 0 var(--app-radius) var(--app-radius) 0 !important;
+	border-left: none !important;
+	background: linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%) !important;
+	box-shadow: var(--app-shadow);
+	padding: 1.25rem 1rem 1.75rem !important;
+}
+
+#addNote--img > h2:first-child {
+	padding-bottom: 0.75rem;
+	margin-bottom: 0.5rem;
+	border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+#sort_cont {
+	border: 1px solid var(--app-border) !important;
+	background: rgba(248, 250, 252, 0.9) !important;
+	border-radius: var(--app-radius-sm) !important;
+	padding: 0.5rem 0.75rem !important;
+	align-items: center !important;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+#sort_cont h3 {
+	font-size: 0.8rem !important;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--app-text-muted) !important;
+	font-weight: 700 !important;
+}
+
+#fromNewest--btn,
+#fromOldest--btn {
+	border-radius: var(--app-radius-sm);
+	padding: 0.4rem 0.75rem !important;
+	font-size: 0.8rem !important;
+	font-weight: 600;
+	border: 1px solid transparent;
+	background: #fff;
+	color: var(--app-text) !important;
+	transition:
+		background 0.15s,
+		border-color 0.15s;
+}
+
+#fromNewest--btn:hover,
+#fromOldest--btn:hover {
+	border-color: rgba(37, 99, 235, 0.35);
+	background: rgba(37, 99, 235, 0.06);
+}
+
+#addNote--img .border-dotted {
+	border: 2px dashed rgba(148, 163, 184, 0.55) !important;
+	border-radius: var(--app-radius) !important;
+	background: rgba(248, 250, 252, 0.65) !important;
+	margin: 1rem auto !important;
+	padding: 1.25rem !important;
+}
+
+#addNote--img .addnote {
+	border-radius: var(--app-radius) !important;
+	border: 1px solid var(--app-border) !important;
+	background: linear-gradient(180deg, #fff, #f1f5f9) !important;
+	box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+	transition:
+		transform 0.15s,
+		box-shadow 0.15s;
+}
+
+#addNote--img .addnote:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 12px 28px rgba(37, 99, 235, 0.15);
+}
+
+#divNotes {
+	gap: 1rem;
+	align-content: flex-start;
+}
+
+#divNotes .note-container {
+	border-radius: var(--app-radius) !important;
+	border: 1px solid rgba(15, 23, 42, 0.08) !important;
+	box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12) !important;
+	overflow: hidden;
+	transition:
+		transform 0.15s ease,
+		box-shadow 0.15s ease;
+}
+
+#divNotes .note-container:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 18px 48px rgba(15, 23, 42, 0.16) !important;
+}
+
+#divNotes .pdf_note--btn img,
+#divNotes .edit_note--btn img,
+#divNotes .del_note--btn img {
+	padding: 6px;
+	border-radius: 10px;
+	background: rgba(255, 255, 255, 0.85);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ——— Stopka ——— */
+.footer_container,
+#footer--cont {
+	width: min(1120px, 100%) !important;
+	margin: 0 auto 1.5rem !important;
+	padding: 0.5rem 0.75rem !important;
+	box-sizing: border-box;
+	border: 1px solid rgba(255, 255, 255, 0.12) !important;
+	border-radius: 999px !important;
+	background: rgba(255, 255, 255, 0.07) !important;
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.footer_container h2,
+#footer--cont h2 {
+	font-size: 0.8rem !important;
+	font-weight: 500 !important;
+	color: rgba(226, 232, 240, 0.75) !important;
+	letter-spacing: 0.02em;
+}
+
+/* ——— Modale / formularze ——— */
+#login_window,
+#reg_form,
+#change_userMail--form,
+#change_userPass--form,
+#add_userAvatar--form,
+#editNote--form,
+#addNote--form,
+#del_Note--modal {
+	top: 50% !important;
+	left: 50% !important;
+	right: auto !important;
+	bottom: auto !important;
+	transform: translate(-50%, -50%) !important;
+	max-width: min(420px, 94vw) !important;
+	width: 100% !important;
+	padding: 1.5rem 1.5rem 1.75rem !important;
+	border: 1px solid rgba(255, 255, 255, 0.14) !important;
+	border-radius: var(--app-radius) !important;
+	background: linear-gradient(160deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.99) 100%) !important;
+	color: #e2e8f0 !important;
+	box-shadow:
+		0 40px 80px rgba(0, 0, 0, 0.45),
+		0 0 0 1px rgba(255, 255, 255, 0.06) inset !important;
+	z-index: 50 !important;
+}
+
+#login_window p.uppercase,
+#reg_form > p.uppercase {
+	font-size: 0.75rem !important;
+	letter-spacing: 0.14em;
+	font-weight: 700;
+	color: rgba(226, 232, 240, 0.85) !important;
+	margin-bottom: 1rem !important;
+}
+
+#google-login-btn {
+	width: 100%;
+	padding: 0.65rem 1rem !important;
+	border-radius: var(--app-radius-sm) !important;
+	background: #fff !important;
+	color: #1e293b !important;
+	font-weight: 600 !important;
+	border: 1px solid rgba(0, 0, 0, 0.06) !important;
+	margin-bottom: 0.5rem;
+}
+
+#login_window label,
+#reg_form label,
+#change_userMail--form label,
+#change_userPass--form label,
+#add_userAvatar--form label,
+#editNote--form label,
+#addNote--form label {
+	font-size: 0.8rem !important;
+	font-weight: 600;
+	color: rgba(203, 213, 225, 0.95) !important;
+	margin-top: 0.35rem !important;
+	margin-bottom: 0.35rem !important;
+}
+
+#login_window input:not([type='submit']),
+#reg_form input:not([type='submit']),
+#change_userMail--form input:not([type='submit']),
+#change_userPass--form input:not([type='submit']),
+#editNote--form input:not([type='submit']),
+#addNote--form input:not([type='submit']),
+#editNote--form textarea,
+#addNote--form textarea {
+	width: 100% !important;
+	max-width: 100%;
+	box-sizing: border-box;
+	border-radius: var(--app-radius-sm) !important;
+	border: 1px solid rgba(148, 163, 184, 0.35) !important;
+	padding: 0.55rem 0.75rem !important;
+	background: rgba(15, 23, 42, 0.5) !important;
+	color: #f8fafc !important;
+	transition:
+		border-color 0.15s,
+		box-shadow 0.15s;
+}
+
+#login_window input:focus,
+#reg_form input:focus,
+#change_userMail--form input:focus,
+#change_userPass--form input:focus,
+#editNote--form input:focus,
+#addNote--form input:focus,
+#editNote--form textarea:focus,
+#addNote--form textarea:focus {
+	outline: none;
+	border-color: rgba(59, 130, 246, 0.65) !important;
+	box-shadow: 0 0 0 3px var(--app-ring);
+}
+
+#btn-submit,
+#reg_submit--btn,
+#sendNewEmail--btn,
+#changePass--btn,
+#add_userAvatar--save__btn,
+#sendNewNote--btn,
+#sendNote--btn,
+#del_Note--btnyes,
+#del_Note--btnno {
+	width: 100%;
+	margin-top: 1rem !important;
+	padding: 0.7rem 1rem !important;
+	border-radius: var(--app-radius-sm) !important;
+	border: none !important;
+	background: linear-gradient(180deg, var(--app-accent) 0%, var(--app-accent-hover) 100%) !important;
+	color: #fff !important;
+	font-weight: 700 !important;
+	cursor: pointer;
+	box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+	transition:
+		filter 0.15s,
+		transform 0.1s;
+}
+
+#btn-submit:hover,
+#reg_submit--btn:hover,
+#sendNewEmail--btn:hover,
+#changePass--btn:hover,
+#add_userAvatar--save__btn:hover,
+#sendNewNote--btn:hover,
+#sendNote--btn:hover,
+#del_Note--btnyes:hover,
+#del_Note--btnno:hover {
+	filter: brightness(1.06);
+}
+
+#del_Note--modal #del_Note--btnyes,
+#del_Note--modal #del_Note--btnno {
+	width: auto;
+	flex: 1;
+	margin: 0.5rem !important;
+}
+
+#del_Note--modal > div {
+	gap: 0.75rem;
+}
+
+#closeMailForm--btn img,
+#closePassForm--btn img,
+#closeEditForm--btn img,
+#closeNoteForm--btn img,
+#close_Avatar--form img {
+	width: 22px;
+	height: 22px;
+	opacity: 0.85;
+	transition: opacity 0.15s;
+}
+
+#closeMailForm--btn:hover img,
+#closePassForm--btn:hover img,
+#closeEditForm--btn:hover img,
+#closeNoteForm--btn:hover img,
+#close_Avatar--form:hover img {
+	opacity: 1;
+}
+
+input[type='file']#add_userAvatar--input {
+	padding: 0.5rem !important;
+	border-style: dashed !important;
+	background: rgba(15, 23, 42, 0.35) !important;
+}

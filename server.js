@@ -1,14 +1,20 @@
-const path = require('path');
-const dotenv = require('dotenv').config({ path: './.env' });
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const express = require('express');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: './.env' });
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import express from 'express';
 const app = express();
 const port = process.env.SERV_PORT || 8088;
-const favicon = require('serve-favicon');
-const fileUpload = require('express-fileupload');
-const cors = require('cors');
-const logger = require('./src/backend/logger.js');
+import favicon from 'serve-favicon';
+import fileUpload from 'express-fileupload';
+import cors from 'cors';
+import { logger } from './src/backend/logger.js';
 
 app.use(cookieParser());
 app.use(express.json());
@@ -36,9 +42,9 @@ app.use(bodyParser.json());
 
 app.use(favicon(path.join(__dirname, './public/images', 'favicon.ico')));
 
-const indexRoutes = require('./src/backend/routes/pages.js');
-const notesRoutes = require('./src/backend/routes/notesRoutes.js');
-const authRoutes = require('./src/backend/routes/auth.js');
+import indexRoutes from './src/backend/routes/pages.js';
+import notesRoutes from './src/backend/routes/notesRoutes.js';
+import authRoutes from './src/backend/routes/auth.js';
 
 app.use('/notes', notesRoutes);
 app.use('/', indexRoutes);

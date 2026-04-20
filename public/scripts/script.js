@@ -42,12 +42,12 @@ btnSubmit.addEventListener('click', async function (e) {
 	e.preventDefault();
 	console.log('Przycisk kliknięty!');
 
-	const sanitizedUsername = sanitizeInput(loginInput.value.trim());
-	const userpassword = passwdInput.value;
+	
+	const userPassword = passwdInput.value;
 	const userEmail = loginEmailInput.value;
 
 	// Logowanie danych przed wysłaniem
-	console.log('Dane do przesłania:', { username: loginInput.value, userpassword: userpassword });
+	console.log('Dane do przesłania:', { userEmail: userEmail, userpassword: userpassword });
 
 	// Walidacja hasła
 	if (!isValidPassword(passwdInput.value)) {
@@ -62,7 +62,7 @@ btnSubmit.addEventListener('click', async function (e) {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ username: sanitizedUsername, userpassword, email: userEmail }),
+			body: JSON.stringify({ email: userEmail, password: userPassword}),
 		});
 
 		if (response.ok) {

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   notesApp:
@@ -18,7 +18,10 @@ services:
         max-file: "5"
     volumes:
       - /root/main/notesApp/logs:/app/src/logs
-      - /root/main/notesApp/.env:/app/.env
+    environment:
+      - SERV_PORT=8088
+    env_file:
+      - .env
 
 networks:
   main_network:

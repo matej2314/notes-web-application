@@ -9,4 +9,4 @@ const formattedDate = function (date) {
 	return `${year}.${month}.${day} ${hours}:${minutes}:${seconds}`;
 };
 
-module.exports = formattedDate;
+export default formattedDate;

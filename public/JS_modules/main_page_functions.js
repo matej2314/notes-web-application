@@ -91,7 +91,7 @@ export const updateNote = async function (noteId, noteTitle, noteContent, noteWe
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ noteId: noteId, notetitle: noteTitle, notetext: noteContent, noteWeight: noteWeight }),
+			body: JSON.stringify({ noteId: noteId, noteTitle: noteTitle, noteText: noteContent, noteWeight: noteWeight }),
 		});
 
 		if (!response.ok) {
