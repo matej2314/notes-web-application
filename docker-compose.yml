@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   notesApp:
-    container_name: notesApp
+    container_name: notes-web-app
     build:
       context: .
       dockerfile: Dockerfile
